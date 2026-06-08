@@ -20,4 +20,4 @@ Tasks run in dependency order. Validation scaffolding comes before product files
 - [x] T012 [FR-1, FR-8, FR-10, SC-1, SC-2, SC-3, SC-4] Update `.github/workflows/ci.yml` with real gating validation and required `Pipeline Complete`.
 - [x] T013 [FR-1, FR-8, FR-10, SC-1, SC-2, SC-3, SC-4] Run local validation: prerequisite check, repository validation, and `nix flake check` when available.
 - [x] T014 [FR-1, FR-2, FR-10, FR-15] Review spec, plan, tasks, README, and implementation for traceability and boundary consistency.
-- [ ] T015 [FR-1] Commit, push `impl/initial`, open PR, poll `Pipeline Complete`, and squash-merge when green.
+- [x] T015 [FR-1] Commit, push `impl/initial`, open PR, poll `Pipeline Complete`, and squash-merge when green.
