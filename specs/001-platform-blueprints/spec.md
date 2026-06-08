@@ -92,7 +92,6 @@ The intended outcome is a small, reusable platform artifact with short flake coo
 
 ## Out of Scope
 
-- Implementing NixOS modules, scripts, tests, or release automation.
 - Moving, deleting, or modifying files in personal-stack or website.
 - Publishing app manifests, Flux application trees, rendered Flux outputs, generated ConfigMaps, dashboards, or consumer cluster overlays from platform-blueprints.
 - Publishing host inventories, `platform/inventory/fleet.yaml`, SSH addresses, deploy keys, tokens, private keys, or other secrets from any consumer.
