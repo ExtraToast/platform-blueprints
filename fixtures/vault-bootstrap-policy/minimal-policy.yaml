@@ -1,0 +1,11 @@
+authMounts:
+  - name: kubernetes
+    type: kubernetes
+kvMounts:
+  - name: secret
+    version: 2
+kubernetesRoles: []
+vsoSecrets: []
+transitKeys: []
+databaseDynamicCredentials: []
+rabbitmqDynamicCredentials: []

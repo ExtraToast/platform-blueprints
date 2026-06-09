@@ -1,0 +1,34 @@
+authMounts:
+  - name: kubernetes
+    type: kubernetes
+    audiences:
+      - vault
+kvMounts:
+  - name: secret
+    version: 2
+kubernetesRoles:
+  - name: vso
+    mount: kubernetes
+    serviceAccounts:
+      - name: vault-secrets-operator
+        namespace: vso-system
+    policies:
+      - vso-read
+vsoSecrets:
+  - name: example-static-secret
+    namespace: app-system
+    mount: secret
+    path: apps/example
+    destinationSecretName: example-secret
+transitKeys:
+  - name: example-jwt
+    type: rsa-2048
+databaseDynamicCredentials:
+  - name: example-database
+    enabled: false
+    plugin: postgresql
+    roles: []
+rabbitmqDynamicCredentials:
+  - name: example-rabbitmq
+    enabled: false
+    roles: []

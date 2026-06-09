@@ -21,6 +21,20 @@ check_required_files() {
     modules/nixos/k3s.nix
     scripts/bootstrap-k3s-agent-token.sh
     scripts/validate-flux.sh
+    scripts/validate-platform-render.sh
+    scripts/backup/backup-service-state.sh
+    scripts/backup/backup-service-snapshots.sh
+    scripts/backup/verify-backup-run.sh
+    scripts/backup/audit-backup-scope.sh
+    specs/003-round3-platform-packs/spec.md
+    specs/003-round3-platform-packs/plan.md
+    specs/003-round3-platform-packs/tasks.md
+    packs/flux-core/README.md
+    packs/edge/README.md
+    packs/observability/README.md
+    examples/backup/manifest.tsv
+    tests/scripts/backup-tooling-smoke.sh
+    docs/dns-zone-policy.md
     .github/workflows/ci.yml
     .github/workflows/release.yml
     release-please-config.json
@@ -121,9 +135,9 @@ check_extraction_boundary() {
   local scan_files=()
   while IFS= read -r path; do
     scan_files+=("${path}")
-  done < <(find flake.nix modules scripts tests -type f ! -path 'scripts/validate-repository.sh' | sort)
+  done < <(find flake.nix modules scripts tests packs examples skeletons fixtures docs -type f ! -path 'scripts/validate-repository.sh' | sort)
 
-  if grep --line-number -E 'personalStack|enschede|frankfurt|jorisjonkers|deploy\.pub|fleet\.yaml|BEGIN (OPENSSH|RSA|EC|DSA) PRIVATE KEY|AGE-SECRET-KEY' "${scan_files[@]}"; then
+  if grep --line-number -E 'personalStack|enschede|frankfurt|jorisjonkers|deploy\.pub|/Users/|/opt/personal-stack|BEGIN (OPENSSH|RSA|EC|DSA) PRIVATE KEY|AGE-SECRET-KEY' "${scan_files[@]}"; then
     record_failure "Found reference-local or secret marker in shared implementation files"
   fi
 }

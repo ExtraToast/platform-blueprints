@@ -9,6 +9,9 @@ Usage:
 Options:
   --apps-path <path>          Directory to search for in-repository Helm charts.
   --enable-helm              Render HelmRelease resources with flux-local and local charts with helm.
+  --offline                   Skip network-dependent Flux HelmRelease expansion.
+  --retry-attempts <count>    Attempts for flux-local remote chart expansion. Default: 3.
+  --retry-delay <seconds>     Delay between flux-local attempts. Default: 10.
   --schema-location <value>   kubeconform schema location. May be repeated.
   --no-strict                Do not pass -strict to kubeconform.
 EOF
@@ -35,11 +38,33 @@ require_dir() {
   fi
 }
 
+retry() {
+  local attempts="$1"
+  local delay_seconds="$2"
+  shift 2
+
+  local attempt=1
+  while true; do
+    if "$@"; then
+      return 0
+    fi
+    if [[ "${attempt}" -ge "${attempts}" ]]; then
+      return 1
+    fi
+    echo "Command failed; retrying in ${delay_seconds}s (${attempt}/${attempts}): $*" >&2
+    sleep "${delay_seconds}"
+    attempt=$((attempt + 1))
+  done
+}
+
 flux_root=""
 cluster_path=""
 apps_path=""
 enable_helm=false
+offline=false
 strict=true
+retry_attempts=3
+retry_delay=10
 schema_locations=()
 
 while [[ "$#" -gt 0 ]]; do
@@ -61,6 +86,19 @@ while [[ "$#" -gt 0 ]]; do
       ;;
     --enable-helm)
       enable_helm=true
+      ;;
+    --offline)
+      offline=true
+      ;;
+    --retry-attempts)
+      shift
+      [[ "$#" -gt 0 ]] || usage
+      retry_attempts="$1"
+      ;;
+    --retry-delay)
+      shift
+      [[ "$#" -gt 0 ]] || usage
+      retry_delay="$1"
       ;;
     --schema-location)
       shift
@@ -100,8 +138,10 @@ require_command kustomize
 require_command kubeconform
 if [[ "${enable_helm}" == "true" ]]; then
   require_command find
-  require_command flux-local
   require_command helm
+  if [[ "${offline}" != "true" ]]; then
+    require_command flux-local
+  fi
 fi
 
 render_output="$(mktemp "${TMPDIR:-/tmp}/platform-blueprints-flux.XXXXXX.yaml")"
@@ -111,8 +151,12 @@ echo "==> kustomize build ${cluster_path}"
 kustomize build "${cluster_path}" > "${render_output}"
 
 if [[ "${enable_helm}" == "true" ]]; then
-  echo "==> flux-local build all --enable-helm ${flux_root}"
-  flux-local build all --enable-helm "${flux_root}" >> "${render_output}"
+  if [[ "${offline}" == "true" ]]; then
+    echo "==> skipping flux-local remote chart expansion (--offline)"
+  else
+    echo "==> flux-local build all --enable-helm ${flux_root}"
+    retry "${retry_attempts}" "${retry_delay}" flux-local build all --enable-helm "${flux_root}" >> "${render_output}"
+  fi
 
   if [[ -d "${apps_path}" ]]; then
     while IFS= read -r chart_file; do

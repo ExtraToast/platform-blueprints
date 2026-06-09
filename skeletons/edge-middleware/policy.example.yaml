@@ -1,0 +1,27 @@
+forwardAuth:
+  middlewareName: forward-auth
+  addressRef:
+    service: auth-service
+    path: /auth/verify
+  trustForwardHeader: true
+  responseHeaders:
+    - X-User-Id
+    - X-User-Groups
+securityHeaders:
+  defaultProfile:
+    browserXssFilter: true
+    contentTypeNosniff: true
+    frameDeny: true
+    referrerPolicy: no-referrer
+cspProfiles:
+  default:
+    enabled: false
+    directives: {}
+  relaxedAdminApp:
+    enabled: false
+    directives: {}
+localTraefik:
+  dashboard:
+    enabled: false
+  certificates:
+    directory: ./infra/traefik/certs
