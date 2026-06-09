@@ -87,12 +87,12 @@ if yaml_paths:
     if yaml is not None:
         for path in yaml_paths:
             try:
-                yaml.safe_load(path.read_text(encoding="utf-8"))
+                list(yaml.safe_load_all(path.read_text(encoding="utf-8")))
             except Exception as exc:
                 failures.append(f"{path}: invalid YAML: {exc}")
     elif shutil.which("ruby"):
         result = subprocess.run(
-            ["ruby", "-e", "require 'yaml'; ARGV.each { |path| YAML.load_file(path) }", *map(str, yaml_paths)],
+            ["ruby", "-e", "require 'yaml'; ARGV.each { |path| YAML.load_stream(File.read(path)) }", *map(str, yaml_paths)],
             text=True,
             capture_output=True,
         )
