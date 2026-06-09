@@ -14,6 +14,23 @@ permissions:
   contents: read
 
 jobs:
+  actionlint:
+    name: Actionlint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install actionlint
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash -o /tmp/download-actionlint.bash
+          bash /tmp/download-actionlint.bash latest /tmp
+
+      - name: Lint GitHub Actions workflows
+        shell: bash
+        run: /tmp/actionlint -color .github/workflows/*.yml
+
   validate:
     name: Validate
     runs-on: ubuntu-latest
@@ -41,7 +58,7 @@ jobs:
   pipeline-complete:
     name: Pipeline Complete
     if: always()
-    needs: [validate]
+    needs: [actionlint, validate]
     runs-on: ubuntu-latest
     steps:
       - uses: re-actors/alls-green@release/v1
