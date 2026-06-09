@@ -8,8 +8,6 @@ metadata:
 authMounts:
   - name: kubernetes
     type: kubernetes
-    audiences:
-      - vault
 kvMounts:
   - name: secret
     version: 2
@@ -23,39 +21,38 @@ kubernetesRoles:
   - name: vso
     mount: kubernetes
     serviceAccounts:
-      - name: vault-secrets-operator
+      - name: ${VSO_SERVICE_ACCOUNT_NAME}
         namespace: ${VSO_NAMESPACE}
     policies:
       - vso-read
     ttl: 1h
 vsoSecrets:
-  - name: example-static-secret
+  - name: app-static-secret
     namespace: ${APP_NAMESPACE}
     mount: secret
     path: ${APP_SECRET_VAULT_PATH}
     destinationSecretName: ${APP_SECRET_NAME}
     vaultAuthRef: vso-auth
-    refreshAfter: 1h
 transitKeys:
   - name: ${VAULT_TRANSIT_SIGNING_KEY_NAME}
     type: rsa-2048
 databaseDynamicCredentials:
-  - name: example-database
+  - name: app-database
     enabled: true
     namespace: ${APP_NAMESPACE}
     mount: database
-    plugin: postgresql
+    plugin: postgresql-database-plugin
     connectionUrl: ${DATABASE_CONNECTION_URL}
     adminUsername: ${DATABASE_ADMIN_USERNAME}
     adminPassword: ${DATABASE_ADMIN_PASSWORD}
     destinationSecretName: ${DATABASE_DYNAMIC_SECRET_NAME}
     roles:
-      - name: app-readwrite
-        creationStatements: ${DATABASE_APP_CREATION_STATEMENTS}
+      - name: app-database
+        creationStatements: ${DATABASE_CREATION_STATEMENTS}
         defaultTtl: 1h
         maxTtl: 24h
 rabbitmqDynamicCredentials:
-  - name: example-rabbitmq
+  - name: app-rabbitmq
     enabled: true
     namespace: ${APP_NAMESPACE}
     mount: rabbitmq
@@ -64,7 +61,7 @@ rabbitmqDynamicCredentials:
     adminPassword: ${RABBITMQ_ADMIN_PASSWORD}
     destinationSecretName: ${RABBITMQ_DYNAMIC_SECRET_NAME}
     roles:
-      - name: app-publisher
+      - name: app-rabbitmq
         vhosts: ${RABBITMQ_DYNAMIC_VHOSTS}
         tags: ${RABBITMQ_DYNAMIC_TAGS}
         configure: ${RABBITMQ_DYNAMIC_CONFIGURE}

@@ -1,16 +1,19 @@
-# NixOS Host Roles and Fleet-to-Flake Skeleton
+# NixOS Host Roles and Fleet-to-Flake Pattern
 
-Design-first only. This directory sketches the next optional host role surface
-without adding production modules or fleet renderers in this round.
+Round 4 promotes the host-role surface into opt-in NixOS modules under
+`modules/nixos/roles` and a fleet helper at `lib/nixos/fleet-to-flake.nix`.
 
-The existing `modules/nixos` base, k3s, and role modules remain the current
-implemented surface. Future role work should add opt-in modules for:
+Implemented role outputs include:
 
-- Raspberry Pi image/profile support
-- Tailscale and flannel interface assumptions
-- utility host firewall profiles
-- GPU runtime profiles
-- fleet inventory to flake/deploy-rs node generation
+- `nixosModules.roleK3sBootstrap`
+- `nixosModules.roleControlPlane`
+- `nixosModules.roleWorker`
+- `nixosModules.roleUtilityHost`
+- `nixosModules.roleGpuAmd`
+- `nixosModules.roleGpuNvidia`
+- `nixosModules.roleNetworkTailscale`
+- `nixosModules.roleRaspberryPiImage`
 
-Consumers must continue to own hostnames, SSH targets, deploy keys, disko
-layouts, secrets, and flake locks.
+The fleet helper is intentionally a pattern, not an inventory renderer owned by
+this repository. Consumers pass their own fleet data, host-specific modules,
+disko layouts, deploy keys, SSH targets, secrets, and flake locks.

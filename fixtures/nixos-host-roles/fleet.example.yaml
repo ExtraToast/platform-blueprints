@@ -1,20 +1,20 @@
 sites:
-  - id: edge-site
-    description: Example edge site
+  - id: ${FLEET_SITE_ID}
+    description: ${FLEET_SITE_DESCRIPTION}
     network:
-      tailnet: example-tailnet
-      flannelInterface: tailscale0
+      tailnet: ${FLEET_TAILNET_NAME}
+      flannelInterface: ${FLEET_FLANNEL_INTERFACE}
 nodes:
-  - id: control-plane-1
-    site: edge-site
-    system: x86_64-linux
+  - id: ${FLEET_CONTROL_PLANE_NODE_ID}
+    site: ${FLEET_SITE_ID}
+    system: ${FLEET_CONTROL_PLANE_SYSTEM}
     roles:
       - k3s-control-plane
     capabilities:
       - public-ingress
-  - id: worker-1
-    site: edge-site
-    system: aarch64-linux
+  - id: ${FLEET_WORKER_NODE_ID}
+    site: ${FLEET_SITE_ID}
+    system: ${FLEET_WORKER_SYSTEM}
     roles:
       - k3s-worker
       - raspberry-pi-image

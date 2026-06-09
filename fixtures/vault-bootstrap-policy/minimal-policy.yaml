@@ -1,3 +1,10 @@
+metadata:
+  name: ${VAULT_BOOTSTRAP_NAME}
+  namespace: ${VAULT_BOOTSTRAP_NAMESPACE}
+  vaultAddress: ${VAULT_ADDR}
+  tokenSecretName: ${VAULT_BOOTSTRAP_TOKEN_SECRET_NAME}
+  tokenSecretKey: ${VAULT_BOOTSTRAP_TOKEN_SECRET_KEY}
+  serviceAccountName: ${VAULT_BOOTSTRAP_SERVICE_ACCOUNT_NAME}
 authMounts:
   - name: kubernetes
     type: kubernetes

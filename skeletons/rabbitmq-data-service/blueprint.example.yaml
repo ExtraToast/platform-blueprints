@@ -1,30 +1,32 @@
 metadata:
-  name: rabbitmq-data-service
+  name: ${RABBITMQ_RELEASE_NAME}
+  namespace: ${RABBITMQ_NAMESPACE}
 oauth2:
   enabled: true
-  issuerUrl: https://issuer.example.invalid
-  managementClientId: rabbitmq-management
-  scopePrefix: rabbitmq
+  issuerUrl: ${RABBITMQ_OAUTH2_ISSUER_URL}
+  managementClientId: ${RABBITMQ_MANAGEMENT_OAUTH_CLIENT_ID}
+  scopePrefix: ${RABBITMQ_OAUTH2_SCOPE_PREFIX}
   adminScopes:
-    - rabbitmq.admin
+    - ${RABBITMQ_OAUTH2_ADMIN_ALIAS_SCOPES}
 internalCredentials:
   secretRef:
-    name: rabbitmq-internal-credentials
-    usernameKey: username
-    passwordKey: password
+    name: ${RABBITMQ_INTERNAL_CREDENTIALS_SECRET_NAME}
+    usernameKey: ${RABBITMQ_INTERNAL_USERNAME_KEY}
+    passwordKey: ${RABBITMQ_INTERNAL_PASSWORD_KEY}
 vaultDynamicBackend:
   enabled: false
-  mount: rabbitmq
+  mount: ${RABBITMQ_DYNAMIC_MOUNT}
   connectionSecretRef:
-    name: rabbitmq-admin-credentials
+    name: ${RABBITMQ_DYNAMIC_CONNECTION_SECRET_NAME}
 plugins:
-  - rabbitmq_management
-  - rabbitmq_prometheus
-  - rabbitmq_auth_backend_oauth2
+  - ${RABBITMQ_PLUGIN_MANAGEMENT}
+  - ${RABBITMQ_PLUGIN_PROMETHEUS}
+  - ${RABBITMQ_PLUGIN_OAUTH2}
 serviceMonitor:
   enabled: true
 storage:
-  size: 10Gi
-  storageClassName: standard
+  size: ${RABBITMQ_STORAGE_SIZE}
+  storageClassName: ${RABBITMQ_STORAGE_CLASS}
 placement:
-  nodeSelector: {}
+  nodeSelector:
+    ${RABBITMQ_NODE_SELECTOR_KEY}: ${RABBITMQ_NODE_SELECTOR_VALUE}

@@ -38,7 +38,6 @@ Import modules in consumer-owned host modules:
   platformBlueprints.base = {
     enable = true;
     ssh.ports = [ 22 ];
-    resolver.nameservers = [ "203.0.113.10" ];
     timeZone = "UTC";
     defaultLocale = "en_US.UTF-8";
   };
@@ -51,11 +50,14 @@ Available module outputs:
 
 - `nixosModules.base`
 - `nixosModules.k3s`
+- `nixosModules.roleK3sBootstrap`
 - `nixosModules.roleControlPlane`
 - `nixosModules.roleWorker`
 - `nixosModules.roleGpuAmd`
 - `nixosModules.roleGpuNvidia`
 - `nixosModules.roleUtilityHost`
+- `nixosModules.roleNetworkTailscale`
+- `nixosModules.roleRaspberryPiImage`
 - `nixosModules.roles.*`
 
 ## Scripts
@@ -64,8 +66,8 @@ Copy a k3s agent token between caller-supplied SSH targets:
 
 ```bash
 nix run github:ExtraToast/platform-blueprints/v0.1.0#bootstrap-k3s-agent-token -- \
-  --control-plane user@control-plane.example.invalid \
-  --agent user@agent.example.invalid \
+  --control-plane "$CONTROL_PLANE_SSH_TARGET" \
+  --agent "$AGENT_SSH_TARGET" \
   --source-token-path /var/lib/rancher/k3s/server/node-token \
   --target-token-path /var/lib/k3s/agent-token
 ```
@@ -96,6 +98,8 @@ Reusable parameterized packs live under:
 
 - `packs/flux-core`: cert-manager, external-dns, Traefik public/LAN, MetalLB, and VSO bases.
 - `packs/edge`: Cloudflare ClusterIssuer, default TLSStore, and forward-auth middleware.
+- `packs/edge-middleware`: Traefik forward-auth, response/security headers, named CSP profiles, local certificate file-provider config, and dashboard exposure.
+- `packs/rabbitmq-data-service`: RabbitMQ Helm release, OAuth2 management config, VSO internal credentials, ServiceMonitor, storage, and placement.
 - `packs/observability`: metrics, Grafana, Loki, Tempo, Alloy, Gatus, alerts, and optional profiling/GPU telemetry.
 
 The manifests use substitution placeholders. Consumers provide namespaces,
@@ -104,6 +108,17 @@ forward-auth endpoints, and component choices through their own Flux
 `postBuild.substitute`, kustomize replacements, or renderer. Application
 IngressRoutes, service-specific dashboards, and Gatus endpoint ConfigMaps stay
 in consumer repositories.
+
+Compile a Vault bootstrap policy model into manifests:
+
+```bash
+nix run github:ExtraToast/platform-blueprints/v0.1.0#compile-vault-bootstrap-policy -- \
+  --input ./platform/vault/policy-model.yaml \
+  --output ./platform/vault/bootstrap.generated.yaml
+```
+
+The generated bootstrap Job contains live-only Vault CLI commands. Apply it
+only after the target cluster has Vault, VSO CRDs, and a bootstrap token Secret.
 
 ## Backup Toolkit
 
@@ -144,10 +159,11 @@ Snapshot plugin commands are caller-owned executables that write payload bytes
 to stdout. This repository does not embed Vault, Consul, Nomad, RabbitMQ, host
 paths, or credential lookup commands.
 
-## Design-First Skeletons
+## Skeleton Models
 
-Round-3 design-first placeholders are under `skeletons/`, `fixtures/`, and
-`docs/`:
+Round-4 promoted the host-role, edge middleware, RabbitMQ, and Vault bootstrap
+surfaces into working packs. Matching `skeletons/`, `fixtures/`, and `docs/`
+remain as input-model examples:
 
 - `skeletons/nixos-host-roles`
 - `skeletons/edge-middleware`
@@ -155,7 +171,7 @@ Round-3 design-first placeholders are under `skeletons/`, `fixtures/`, and
 - `skeletons/vault-bootstrap-policy`
 - `docs/dns-zone-policy.md`
 
-These are input models and documentation only, not production renderers.
+These examples are not inventories, rendered output, or live secret material.
 
 ## Versioning
 

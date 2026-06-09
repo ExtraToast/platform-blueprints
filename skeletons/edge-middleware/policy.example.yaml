@@ -1,27 +1,29 @@
 forwardAuth:
-  middlewareName: forward-auth
+  middlewareName: ${EDGE_FORWARD_AUTH_MIDDLEWARE_NAME}
   addressRef:
-    service: auth-service
-    path: /auth/verify
+    service: ${EDGE_FORWARD_AUTH_SERVICE_NAME}
+    path: ${EDGE_FORWARD_AUTH_VERIFY_PATH}
   trustForwardHeader: true
   responseHeaders:
-    - X-User-Id
-    - X-User-Groups
+    - ${EDGE_FORWARD_AUTH_RESPONSE_HEADER_USER}
+    - ${EDGE_FORWARD_AUTH_RESPONSE_HEADER_GROUPS}
 securityHeaders:
   defaultProfile:
     browserXssFilter: true
     contentTypeNosniff: true
     frameDeny: true
-    referrerPolicy: no-referrer
+    referrerPolicy: ${EDGE_SECURITY_REFERRER_POLICY}
 cspProfiles:
-  default:
+  strict:
     enabled: false
-    directives: {}
-  relaxedAdminApp:
+    policy: ${EDGE_CSP_STRICT_POLICY}
+  admin:
     enabled: false
-    directives: {}
+    policy: ${EDGE_CSP_ADMIN_POLICY}
 localTraefik:
   dashboard:
     enabled: false
+    hostname: ${EDGE_DASHBOARD_HOSTNAME}
   certificates:
-    directory: ./infra/traefik/certs
+    certFile: ${EDGE_LOCAL_CERT_FILE_PATH}
+    keyFile: ${EDGE_LOCAL_KEY_FILE_PATH}

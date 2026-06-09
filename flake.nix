@@ -39,18 +39,24 @@
       nixosModules = rec {
         base = import ./modules/nixos/base.nix;
         k3s = import ./modules/nixos/k3s.nix;
+        roleK3sBootstrap = import ./modules/nixos/roles/k3s-bootstrap.nix;
         roleControlPlane = import ./modules/nixos/roles/control-plane.nix;
         roleWorker = import ./modules/nixos/roles/worker.nix;
         roleGpuAmd = import ./modules/nixos/roles/gpu-amd.nix;
         roleGpuNvidia = import ./modules/nixos/roles/gpu-nvidia.nix;
         roleUtilityHost = import ./modules/nixos/roles/utility-host.nix;
+        roleNetworkTailscale = import ./modules/nixos/roles/network-tailscale.nix;
+        roleRaspberryPiImage = import ./modules/nixos/roles/raspberry-pi-image.nix;
 
         roles = {
+          k3sBootstrap = roleK3sBootstrap;
           controlPlane = roleControlPlane;
           worker = roleWorker;
           gpuAmd = roleGpuAmd;
           gpuNvidia = roleGpuNvidia;
           utilityHost = roleUtilityHost;
+          networkTailscale = roleNetworkTailscale;
+          raspberryPiImage = roleRaspberryPiImage;
         };
 
         default = {
@@ -74,6 +80,7 @@
           backup-service-snapshots = mkScriptPackage pkgs "backup-service-snapshots" ./scripts/backup/backup-service-snapshots.sh;
           verify-backup-run = mkScriptPackage pkgs "verify-backup-run" ./scripts/backup/verify-backup-run.sh;
           audit-backup-scope = mkScriptPackage pkgs "audit-backup-scope" ./scripts/backup/audit-backup-scope.sh;
+          compile-vault-bootstrap-policy = mkScriptPackage pkgs "compile-vault-bootstrap-policy" ./scripts/vault/compile-vault-bootstrap-policy.py;
           default = validate-flux;
         }
       );
@@ -112,6 +119,10 @@
             type = "app";
             program = "${packages.audit-backup-scope}/bin/audit-backup-scope";
           };
+          compile-vault-bootstrap-policy = {
+            type = "app";
+            program = "${packages.compile-vault-bootstrap-policy}/bin/compile-vault-bootstrap-policy";
+          };
           default = self.apps.${system}.validate-flux;
         }
       );
@@ -137,8 +148,13 @@
             ${pkgs.bash}/bin/bash -n ${./scripts/backup/verify-backup-run.sh}
             ${pkgs.bash}/bin/bash -n ${./scripts/backup/audit-backup-scope.sh}
             ${pkgs.bash}/bin/bash -n ${./scripts/validate-repository.sh}
+            ${pkgs.python3}/bin/python3 -m py_compile ${./scripts/vault/compile-vault-bootstrap-policy.py}
             touch "$out"
           '';
         };
+
+      lib = {
+        nixosFleet = import ./lib/nixos/fleet-to-flake.nix { inherit lib; };
+      };
     };
 }

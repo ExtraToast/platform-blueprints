@@ -7,11 +7,14 @@ lib.nixosSystem {
   modules = [
     self.nixosModules.base
     self.nixosModules.k3s
+    self.nixosModules.roleK3sBootstrap
     self.nixosModules.roleControlPlane
     self.nixosModules.roleWorker
     self.nixosModules.roleGpuAmd
     self.nixosModules.roleGpuNvidia
     self.nixosModules.roleUtilityHost
+    self.nixosModules.roleNetworkTailscale
+    self.nixosModules.roleRaspberryPiImage
     (
       { pkgs, ... }:
       {
@@ -31,7 +34,7 @@ lib.nixosSystem {
             passwordlessSudo = true;
           };
           resolver = {
-            nameservers = [ "203.0.113.10" ];
+            nameservers = [ "RESOLVER_ADDRESS" ];
             options = [
               "timeout:1"
               "attempts:2"
@@ -44,7 +47,7 @@ lib.nixosSystem {
         platformBlueprints.roles.controlPlane = {
           enable = true;
           oidc = {
-            issuerUrl = "https://issuer.example.invalid";
+            issuerUrl = "OIDC_ISSUER_URL";
             clientId = "dashboard";
             groupsClaim = "groups";
           };
@@ -59,6 +62,13 @@ lib.nixosSystem {
         };
 
         platformBlueprints.roles.utilityHost.enable = true;
+
+        platformBlueprints.roles.k3sBootstrap = {
+          enable = true;
+          flannelInterface = "mesh0";
+          waitForInterface = true;
+          nodeLabels.bootstrap = "fixture";
+        };
 
         environment.systemPackages = [ pkgs.hello ];
       }

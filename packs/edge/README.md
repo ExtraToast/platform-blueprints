@@ -10,3 +10,6 @@ Parameterized edge primitives for Flux-managed Traefik clusters:
 The pack intentionally does not include application `IngressRoute` resources.
 Route catalogs and probe endpoint ConfigMaps are expected to come from a
 consumer renderer such as `deploy-config-schema`.
+
+Use `packs/edge-middleware` for named CSP/header profiles, local certificate
+file-provider config, and dashboard exposure.
