@@ -1,0 +1,25 @@
+sites:
+  - id: edge-site
+    description: Example edge site
+    network:
+      tailnet: example-tailnet
+      flannelInterface: tailscale0
+nodes:
+  - id: control-plane-1
+    site: edge-site
+    system: x86_64-linux
+    roles:
+      - k3s-control-plane
+    capabilities:
+      - public-ingress
+  - id: worker-1
+    site: edge-site
+    system: aarch64-linux
+    roles:
+      - k3s-worker
+      - raspberry-pi-image
+rendererTargets:
+  flake:
+    enabled: false
+  deployRs:
+    enabled: false

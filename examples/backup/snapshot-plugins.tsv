@@ -1,0 +1,2 @@
+# artifact	output_file	required	command_path	description
+example-snapshot	example.snapshot	true	./tests/fixtures/backup/example-snapshot.sh	Example service-native snapshot fixture

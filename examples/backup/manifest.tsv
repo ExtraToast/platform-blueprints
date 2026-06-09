@@ -1,0 +1,3 @@
+# host_group	service_name	source_path	required	description
+primary	example-data	/var/lib/example	true	Example required service data
+primary	example-cache	/var/cache/example	false	Example optional cache state

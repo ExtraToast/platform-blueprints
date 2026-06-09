@@ -81,6 +81,82 @@ nix run github:ExtraToast/platform-blueprints/v0.1.0#validate-flux -- \
 
 Both scripts validate required commands and inputs before doing work.
 
+Run consumer-owned render commands and fail if generated files drift:
+
+```bash
+nix run github:ExtraToast/platform-blueprints/v0.1.0#validate-platform-render -- \
+  --repo-root "$PWD" \
+  --render-command-file ./platform/render-commands.txt \
+  --generated-path-file ./platform/generated-paths.txt
+```
+
+## Flux Packs
+
+Reusable parameterized packs live under:
+
+- `packs/flux-core`: cert-manager, external-dns, Traefik public/LAN, MetalLB, and VSO bases.
+- `packs/edge`: Cloudflare ClusterIssuer, default TLSStore, and forward-auth middleware.
+- `packs/observability`: metrics, Grafana, Loki, Tempo, Alloy, Gatus, alerts, and optional profiling/GPU telemetry.
+
+The manifests use substitution placeholders. Consumers provide namespaces,
+domains, ACME emails, token secret names, storage sizes, node selectors,
+forward-auth endpoints, and component choices through their own Flux
+`postBuild.substitute`, kustomize replacements, or renderer. Application
+IngressRoutes, service-specific dashboards, and Gatus endpoint ConfigMaps stay
+in consumer repositories.
+
+## Backup Toolkit
+
+List and dry-run a manifest-driven remote filesystem backup:
+
+```bash
+nix run github:ExtraToast/platform-blueprints/v0.1.0#backup-service-state -- \
+  --manifest ./backups/manifest.tsv \
+  --dry-run
+```
+
+Capture service-native snapshot plugins declared by the consumer:
+
+```bash
+nix run github:ExtraToast/platform-blueprints/v0.1.0#backup-service-snapshots -- \
+  --plugins ./backups/snapshot-plugins.tsv \
+  --output-dir ./backups/run-$(date -u +%Y%m%dT%H%M%SZ)
+```
+
+Verify a run:
+
+```bash
+nix run github:ExtraToast/platform-blueprints/v0.1.0#verify-backup-run -- \
+  --run-dir ./backups/run-example \
+  --manifest ./backups/manifest.tsv \
+  --required-snapshot vault-raft-snapshot
+```
+
+Audit backup coverage against caller-owned expected paths:
+
+```bash
+nix run github:ExtraToast/platform-blueprints/v0.1.0#audit-backup-scope -- \
+  --manifest ./backups/manifest.tsv \
+  --expected-paths ./backups/expected-paths.tsv
+```
+
+Snapshot plugin commands are caller-owned executables that write payload bytes
+to stdout. This repository does not embed Vault, Consul, Nomad, RabbitMQ, host
+paths, or credential lookup commands.
+
+## Design-First Skeletons
+
+Round-3 design-first placeholders are under `skeletons/`, `fixtures/`, and
+`docs/`:
+
+- `skeletons/nixos-host-roles`
+- `skeletons/edge-middleware`
+- `skeletons/rabbitmq-data-service`
+- `skeletons/vault-bootstrap-policy`
+- `docs/dns-zone-policy.md`
+
+These are input models and documentation only, not production renderers.
+
 ## Versioning
 
 Releases are managed with release-please. Consumers should pin an exact tag or locked revision and let Renovate propose updates in their own repository. Each consumer can review and advance the shared platform version independently.
@@ -89,6 +165,7 @@ Releases are managed with release-please. Consumers should pin an exact tag or l
 
 ```bash
 bash scripts/validate-repository.sh
+bash tests/scripts/backup-tooling-smoke.sh
 nix flake check --print-build-logs
 ```
 

@@ -1,0 +1,30 @@
+metadata:
+  name: rabbitmq-data-service
+oauth2:
+  enabled: true
+  issuerUrl: https://issuer.example.invalid
+  managementClientId: rabbitmq-management
+  scopePrefix: rabbitmq
+  adminScopes:
+    - rabbitmq.admin
+internalCredentials:
+  secretRef:
+    name: rabbitmq-internal-credentials
+    usernameKey: username
+    passwordKey: password
+vaultDynamicBackend:
+  enabled: false
+  mount: rabbitmq
+  connectionSecretRef:
+    name: rabbitmq-admin-credentials
+plugins:
+  - rabbitmq_management
+  - rabbitmq_prometheus
+  - rabbitmq_auth_backend_oauth2
+serviceMonitor:
+  enabled: true
+storage:
+  size: 10Gi
+  storageClassName: standard
+placement:
+  nodeSelector: {}

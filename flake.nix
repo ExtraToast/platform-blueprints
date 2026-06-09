@@ -69,6 +69,11 @@
         rec {
           bootstrap-k3s-agent-token = mkScriptPackage pkgs "bootstrap-k3s-agent-token" ./scripts/bootstrap-k3s-agent-token.sh;
           validate-flux = mkScriptPackage pkgs "validate-flux" ./scripts/validate-flux.sh;
+          validate-platform-render = mkScriptPackage pkgs "validate-platform-render" ./scripts/validate-platform-render.sh;
+          backup-service-state = mkScriptPackage pkgs "backup-service-state" ./scripts/backup/backup-service-state.sh;
+          backup-service-snapshots = mkScriptPackage pkgs "backup-service-snapshots" ./scripts/backup/backup-service-snapshots.sh;
+          verify-backup-run = mkScriptPackage pkgs "verify-backup-run" ./scripts/backup/verify-backup-run.sh;
+          audit-backup-scope = mkScriptPackage pkgs "audit-backup-scope" ./scripts/backup/audit-backup-scope.sh;
           default = validate-flux;
         }
       );
@@ -86,6 +91,26 @@
           validate-flux = {
             type = "app";
             program = "${packages.validate-flux}/bin/validate-flux";
+          };
+          validate-platform-render = {
+            type = "app";
+            program = "${packages.validate-platform-render}/bin/validate-platform-render";
+          };
+          backup-service-state = {
+            type = "app";
+            program = "${packages.backup-service-state}/bin/backup-service-state";
+          };
+          backup-service-snapshots = {
+            type = "app";
+            program = "${packages.backup-service-snapshots}/bin/backup-service-snapshots";
+          };
+          verify-backup-run = {
+            type = "app";
+            program = "${packages.verify-backup-run}/bin/verify-backup-run";
+          };
+          audit-backup-scope = {
+            type = "app";
+            program = "${packages.audit-backup-scope}/bin/audit-backup-scope";
           };
           default = self.apps.${system}.validate-flux;
         }
@@ -106,6 +131,11 @@
           script-syntax = pkgs.runCommand "platform-blueprints-script-syntax" { } ''
             ${pkgs.bash}/bin/bash -n ${./scripts/bootstrap-k3s-agent-token.sh}
             ${pkgs.bash}/bin/bash -n ${./scripts/validate-flux.sh}
+            ${pkgs.bash}/bin/bash -n ${./scripts/validate-platform-render.sh}
+            ${pkgs.bash}/bin/bash -n ${./scripts/backup/backup-service-state.sh}
+            ${pkgs.bash}/bin/bash -n ${./scripts/backup/backup-service-snapshots.sh}
+            ${pkgs.bash}/bin/bash -n ${./scripts/backup/verify-backup-run.sh}
+            ${pkgs.bash}/bin/bash -n ${./scripts/backup/audit-backup-scope.sh}
             ${pkgs.bash}/bin/bash -n ${./scripts/validate-repository.sh}
             touch "$out"
           '';
