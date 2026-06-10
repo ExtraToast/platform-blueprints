@@ -1,0 +1,2 @@
+# artifact	input_file	required	command_path	description
+example-snapshot	example.snapshot	true	./tests/fixtures/restore/example-snapshot-restore.sh	Example service-native restore fixture
