@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/ExtraToast/platform-blueprints/compare/platform-blueprints-v1.0.0...platform-blueprints-v1.1.0) (2026-06-10)
+
+
+### Features
+
+* extract generic k8s restore toolkit primitives (spec 010) ([#10](https://github.com/ExtraToast/platform-blueprints/issues/10)) ([5fa3d7f](https://github.com/ExtraToast/platform-blueprints/commit/5fa3d7f72b33ce7fa389cce4c6a45f95630ffb23))
+* strict Flux render-validation tooling + pinned CRD catalog (spec 009) ([#12](https://github.com/ExtraToast/platform-blueprints/issues/12)) ([832009e](https://github.com/ExtraToast/platform-blueprints/commit/832009e68f1a8cdc02c98abdea08ee58443d293f))
+
 ## 1.0.0 (2026-06-09)
 
 
