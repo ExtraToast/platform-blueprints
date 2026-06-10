@@ -1,0 +1,8 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: fixture-charts
+  namespace: flux-render-fixture
+spec:
+  interval: 10m
+  url: https://charts.example.invalid

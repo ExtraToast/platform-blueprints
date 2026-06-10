@@ -49,6 +49,10 @@ jobs:
         shell: bash
         run: bash tests/scripts/restore-tooling-smoke.sh
 
+      - name: Run Flux render validation smoke test
+        shell: bash
+        run: bash tests/scripts/flux-render-validation-smoke.sh
+
       - name: Run Nix flake check when available
         shell: bash
         run: |
