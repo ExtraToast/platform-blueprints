@@ -29,6 +29,8 @@ jobs:
       contents: read
     steps:
       # This repo is consumed by version tag/ref, not a package registry.
+      # Consumers check out the tag and pass that checkout as an explicit
+      # blueprints root to deploy-config-schema.
       - name: Publish release tag reference
         shell: bash
         run: echo "Release tag ${{ needs.release-please.outputs.tag_name }} is available for consumers."
