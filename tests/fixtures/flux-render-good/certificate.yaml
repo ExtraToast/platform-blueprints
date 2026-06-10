@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: fixture-cert
+  namespace: flux-render-fixture
+spec:
+  secretName: fixture-cert-tls
+  dnsNames:
+    - fixture.example.invalid
+  issuerRef:
+    name: fixture-issuer
+    kind: ClusterIssuer

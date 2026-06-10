@@ -1,0 +1,6 @@
+resources:
+  - namespace.yaml
+  - deployment.yaml
+  - helm-repository.yaml
+  - helm-release.yaml
+  - certificate.yaml
